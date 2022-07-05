@@ -1,0 +1,34 @@
+initially: 
+
+                & shuffle, initial, solve buttons are displayed
+                & puzzle is responsive to arrow keys
+                & "click shuffle to shuffle the puzzle" is displayed
+
+shuffle button is clicked:
+                
+                & puzzle is shuffled 
+                & shuffle, initial, solve buttons are displayed
+                & puzzle is responsive to arrow keys
+                & "try solving the puzzle using arrow keys or click solve to solve from the initial state" is displayed
+
+initial button is clicked:
+                & initial puzzle is displayed
+                & shuffle, initial, solve buttons are displayed
+                & puzzle is responsive to arrow keys
+                & "try solving the puzzle using arrow keys or click solve to solve from the initial state" is displayed
+
+solve button is clicked: 
+                
+                & puzzle is solved from the initial state 
+                & shuffle, next, previous buttons are displayed
+                & puzzle becomes unresponsive to arrow keys
+                & "click next to see the next move", "click previous to see the previous move" are displayed  
+
+if the user reaches the goal state:
+
+                & "Congratulations! You have solved the puzzle." is displayed
+                & number of moves taken by the user is displayed
+                & least number of moves required is displayed
+                & shuffle, solve button is displayed
+                & puzzle is unresponsive to arrow keys
+                & "click shuffle to play again" is displayed
