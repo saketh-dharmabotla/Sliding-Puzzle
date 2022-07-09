@@ -378,7 +378,7 @@ function display() {
         </div>
 
         <button class = "close-button" id = "congratulations-close-button">
-            <img class = "close-icon" src="images/close-instructions-icon.JPG" alt="close button">
+            <img class = "close-icon" src="images/close-icon.JPG" alt="close button">
         </button>
         
         `;
