@@ -303,6 +303,8 @@ function display() {
 
         document.getElementById("solution-move-number").innerHTML = '';
         document.getElementById("solution-move-number").innerHTML += `
+        The solution takes ${totalSolutionMoves} moves.
+        <br><br>
         Move number : ${moveNumber}
         `;
         document.getElementById("solution-move-number").style.opacity = 1;
