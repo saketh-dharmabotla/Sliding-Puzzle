@@ -1,16 +1,3 @@
-const container = document.querySelector('#puzzleContainer');
-
-const numberOfMoves = document.querySelector('#numberOfMoves');
-
-const shuffle = document.querySelector('#shuffle');
-
-const initial = document.querySelector('#initial');
-const set = document.querySelector('#set');
-const solve = document.querySelector('#solve');
-
-const previous = document.querySelector('#previous');
-const next = document.querySelector('#next');
-
 function manhattanPriority(puzzle, noOfMoves) {
     let m = 0;
     for(let i = 0; i < puzzle.length; i++) {
@@ -144,38 +131,51 @@ class MinHeap {
     }
 }
 
+let size = 3;
 
 let initialState = [];
-let state = []; 
-let size = 3;
+let currentState = [];
 let empty = size*size;
-let moves = 0;
+
+let totalSolutionMoves = 0;
+let totalUserMoves = 0;
 let moveNumber = 0;
-let userMoves = 0;
+
 let solved = -1;
+
+let gameWindow = document.querySelector("#game-window");
+let puzzleContainer = document.getElementById("puzzle-container");
+let buttonsContainer = document.getElementById("buttons-container");
+let shuffleContainer = document.getElementById("shuffle-button-container");
+let goToInitialContainer = document.getElementById("start-from-initial-state-button-container");
+let setInitialContainer = document.getElementById("set-initial-state-button-container");
+let showSolutionContainer = document.getElementById("show-the-solution-button-container");
+let previousContainer = document.getElementById("show-the-previous-state-button-container");
+let nextContainer = document.getElementById("show-the-next-state-button-container");
+
+let shuffle = document.getElementById("shuffle-button");
+let goToInitial = document.getElementById("start-from-initial-state-button");
+let setInitial = document.getElementById("set-initial-state-button");
+let showSolution = document.getElementById("show-the-solution-button");
+let previous = document.getElementById("show-the-previous-state-button");
+let next = document.getElementById("show-the-next-state-button");
+
+let instructionsButton = document.getElementById("instructions-button");
+let instructionsCloseButton = document.getElementById("instructions-close-button");
+let instructionsWindow = document.getElementById("instructions-pop-up-window");
+
+let playAgainButton = document.getElementById("play-again-button");
+let viewSolutionButton = document.getElementById("view-the-solution-button");
+let congratulationsCloseButton = document.getElementById("congratulations-close-button"); 
+let congratulationsWindow = document.getElementById("congratulations-message-pop-up-window");
+
 let neighbours = [];
 let minHeap = new MinHeap(0);
 let path = [];
 let index = 0;
 
-generate();
-
-display();
-
-handleShuffle();
-
-handleInitial();
-
-handleSet();
-
-handleSolve();
-
-handlePrevious();
-
-handleNext();
-
-handleInput(); 
-
+reset();
+handleInput();
 
 function getRow(pos) {
     return Math.ceil(pos/size) - 1;
@@ -189,112 +189,322 @@ function getCol(pos) {
     return col - 1;
 }
 
-function generate(){
+function isSolved() {
+    
+    for(let tile of currentState) {
+        if(tile.value != tile.position) return 0;
+    }
+
+    return 2;
+}
+
+function display() {
+    puzzleContainer.innerHTML = '';
+    
+    for(let tile of currentState) {
+
+        if(tile.value == size*size) {
+            continue;
+        }
+
+        puzzleContainer.innerHTML += `
+        <div class = 'tiles', style = "top: ${tile.x*(480/size)}px; left: ${tile.y*(480/size)}px;"> 
+        ${tile.value}
+        </div>
+        `;
+    }
+
+    //reset
+    if(solved == -1) {
+        ;
+    }
+
+    //unsolved 
+    if(solved == -1 || solved == 0) {
+        shuffleContainer.innerHTML = '';
+        goToInitialContainer.innerHTML = '';
+        setInitialContainer.innerHTML = '';
+        showSolutionContainer.innerHTML = '';
+        previousContainer.innerHTML = '';
+        nextContainer.innerHTML = '';
+
+        shuffleContainer.innerHTML += `
+        <button class = "buttons" id = "shuffle-button">
+            Shuffle the puzzle
+        </button>
+        `;
+
+        goToInitialContainer.innerHTML += `
+        <button class = "buttons" id = "start-from-initial-state-button">
+            Start again from the initial state
+        </button>
+ 
+        `;
+        
+        setInitialContainer.innerHTML += `
+        <button class = "buttons" id = "set-initial-state-button">
+            Set the current state as the initial state
+        </button>
+        `;
+
+        showSolutionContainer.innerHTML += `
+        <button class = "buttons" id = "show-the-solution-button">
+            Show the solution starting from the initial state
+        </button>
+        `;
+
+        buttonsContainer.style.left = "70px";
+        buttonsContainer.style.right = "0px";
+
+        document.getElementById("current-user-moves").innerHTML = '';
+        document.getElementById("current-user-moves").innerHTML += `
+        You've made ${totalUserMoves} moves so far
+        `;
+        document.getElementById("current-user-moves").style.opacity = 1;
+        
+        document.getElementById("solution-move-number").innerHTML = '';
+        document.getElementById("solution-move-number").style.opacity = 0;
+
+        handleInput();
+    }
+
+    //solved by computer
+    if(solved == 1) {
+        shuffleContainer.innerHTML = '';
+        goToInitialContainer.innerHTML = '';
+        setInitialContainer.innerHTML = '';
+        showSolutionContainer.innerHTML = '';
+        previousContainer.innerHTML = '';
+        nextContainer.innerHTML = '';
+
+        shuffleContainer.innerHTML += `
+        <button class = "buttons" id = "shuffle-button">
+            Shuffle the puzzle
+        </button>
+        `;
+
+        previousContainer.innerHTML += `
+        <button class = "buttons" id = "show-the-previous-state-button">
+            Show the previous state
+        </button>
+        `;
+
+        nextContainer.innerHTML += `
+        <button class = "buttons" id = "show-the-next-state-button">
+            Show the next state
+        </button>
+        `;
+
+        buttonsContainer.style.left = "200px";
+        buttonsContainer.style.right = "550px";
+
+        document.getElementById("current-user-moves").innerHTML = '';
+        document.getElementById("current-user-moves").style.opacity = 0;
+
+        document.getElementById("solution-move-number").innerHTML = '';
+        document.getElementById("solution-move-number").innerHTML += `
+        Move number : ${moveNumber}
+        `;
+        document.getElementById("solution-move-number").style.opacity = 1;
+
+        handleInput();
+
+    }
+
+    //solved by user
+    if(solved == 2) {
+
+        shuffleContainer.innerHTML = '';
+        goToInitialContainer.innerHTML = '';
+        setInitialContainer.innerHTML = '';
+        showSolutionContainer.innerHTML = '';
+        previousContainer.innerHTML = '';
+        nextContainer.innerHTML = '';
+
+        shuffleContainer.innerHTML += `
+        <button class = "buttons" id = "shuffle-button">
+            Shuffle the puzzle
+        </button>
+        `;
+
+        goToInitialContainer.innerHTML += `
+        <button class = "buttons" id = "start-from-initial-state-button">
+            Start again from the initial state
+        </button>
+ 
+        `;
+        
+        setInitialContainer.innerHTML += `
+        <button class = "buttons" id = "set-initial-state-button">
+            Set the current state as the initial state
+        </button>
+        `;
+
+        showSolutionContainer.innerHTML += `
+        <button class = "buttons" id = "show-the-solution-button">
+            Show the solution starting from the initial state
+        </button>
+        `;
+
+        congratulationsWindow.innerHTML = '';
+        congratulationsWindow.innerHTML += `
+        <div id = 'congratulations-message-container'>
+
+            <p id = "congratulations-message">
+                Congratulations!
+                <br><br>
+                You solved the puzzle.
+                <br><br>
+                It took you ${totalUserMoves} moves.  
+                <br><br>
+                The optimal solution takes ${totalSolutionMoves} moves.
+                <br><br>
+                See the solution or play again! 
+            </p>    
+    
+            <div id = "congratulations-buttons-container">
+                
+                <button class = "buttons" id = "play-again-button">
+                    Play again
+                </button>
+
+                <button class = "buttons" id = "view-the-solution-button">
+                    View the solution
+                </button>
+    
+            </div>
+        </div>
+
+        <button class = "close-button" id = "congratulations-close-button">
+            <img class = "close-icon" src="/images/close-instructions-icon.jpg" alt="close button">
+        </button>
+        
+        `;
+
+        buttonsContainer.style.left = "70px";
+        buttonsContainer.style.right = "0px";
+
+        document.getElementById("current-user-moves").innerHTML = '';
+        document.getElementById("current-user-moves").style.opacity = 0;
+        document.getElementById("solution-move-number").innerHTML = '';
+        document.getElementById("solution-move-number").style.opacity = 0;
+        
+        congratulationsWindow.style.opacity = 1;
+        gameWindow.style.opacity = 0.4;
+        
+        handleInput();
+    }
+}
+
+function instructionsDisplay() {
+    instructionsWindow.style.opacity = 1;
+    gameWindow.style.opacity = 0.4;
+}
+
+function instructionsClose() {
+    instructionsWindow.style.opacity = 0;
+    gameWindow.style.opacity = 1;
+}
+
+function instructionsDisplay() {
+    instructionsWindow.style.opacity = 1;
+    gameWindow.style.opacity = 0.4;
+}
+
+function congratulationsClose() {
+    congratulationsWindow.style.opacity = 0;
+    gameWindow.style.opacity = 1;
+    reset();
+}
+
+function viewSolution() {
+    congratulationsWindow.style.opacity = 0;
+    gameWindow.style.opacity = 1;
+    solveInitialState();
+}
+
+function playAgain() {
+    congratulationsWindow.style.opacity = 0;
+    gameWindow.style.opacity = 1;
+    reset();
+}
+
+function reset(){
+
+    initialState = [];
+    currentState = [];
+    empty = size*size;
+
+    totalSolutionMoves = 0;
+    totalUserMoves = 0;
+    moveNumber = 0;
+
+    solved = -1;
+
     for(let i = 1; i <= size*size; i++) {
-        state.push({
+        currentState.push({
             value: i,
             position: i,
             x: getRow(i),
             y: getCol(i),
         });
 
-        initialState.push(state[i - 1].value);
-    }
-}
-
-/*
-       function getRandomValues() {
-    const values = [];
-    for(let i = 1; i <= size*size; i++)
-        values.push(i);
-
-    const randomValues = values.sort(() => Math.random() - 0.5);
-    return randomValues;
-}
-*/
-
-function shufflePuzzle() {
-    /* const randomValues = getRandomValues();
-
-    for(let i = 0; i < size*size; i++) {
-        state[i].value = randomValues[i];
-
-        initialState[i] = state[i].value;
-
-        if(state[i].value == size*size) {
-            empty = state[i].position;
-        }
-    }
-    */
-
-    let x;
-
-    do {
-        userMoves = 0;
-
-        while(userMoves < 30) {
-            x = Math.floor((Math.random() * 4));
-
-            switch(x) {
-                case 0: {
-                    moveLeft();
-                    break;
-                }
-
-                case 1: {
-                    moveRight();
-                    break;
-                }
-
-                case 2: {
-                    moveUp();
-                    break;
-                }
-
-                case 3: {
-                    moveDown();
-                    break;
-                }
-            }
-
-            solved = 0;
-            display();
-
-        }
-    } while(isSolved());
-
-    for(let i = 0; i < size*size; i++) {
-        initialState[i] = state[i].value;
-
-        if(state[i].value == size*size) {
-            empty = state[i].position;
-        }
+        initialState.push(currentState[i - 1].value);
     }
 
-    solved = 0;
-    userMoves = 0;
-    solution();
     display();
 }
 
-function handleShuffle() {
-    shuffle.addEventListener('click', shufflePuzzle);
-}
-
-function isSolved() {
-    
-    for(let tile of state) {
-        if(tile.value != tile.position) {return 0;}
-    }
-
-    return 2;
-}
-
 function handleInput() {
-    document.addEventListener('keydown', handleKeyDown);
+
+    
+    gameWindow = document.getElementById("game-window");
+    puzzleContainer = document.getElementById("puzzle-container");
+
+    shuffleContainer = document.getElementById("shuffle-button-container");
+    goToInitialContainer = document.getElementById("start-from-initial-state-button-container");
+    setInitialContainer = document.getElementById("set-initial-state-button-container");
+    showSolutionContainer = document.getElementById("show-the-solution-button-container");
+    previousContainer = document.getElementById("show-the-previous-state-button-container");
+    nextContainer = document.getElementById("show-the-next-state-button-container");
+
+
+    shuffle = document.getElementById("shuffle-button");
+    goToInitial = document.getElementById("start-from-initial-state-button");
+    setInitial = document.getElementById("set-initial-state-button");
+    showSolution = document.getElementById("show-the-solution-button");
+    previous = document.getElementById("show-the-previous-state-button");
+    next = document.getElementById("show-the-next-state-button");
+
+    instructionsButton = document.getElementById("instructions-button");
+    instructionsCloseButton = document.getElementById("instructions-close-button");
+    instructionsWindow = document.getElementById("instructions-pop-up-window");
+
+    playAgainButton = document.getElementById("play-again-button");
+    viewSolutionButton = document.getElementById("view-the-solution-button");
+    congratulationsCloseButton = document.getElementById("congratulations-close-button"); 
+    congratulationsWindow = document.getElementById("congratulations-message-pop-up-window");
+
+
+    handleKeyPress();
+    handleShuffle();
+    handleInitialState();
+    handleSetInitialState();
+    handleShowSolution();
+    handlePreviousState();
+    handleNextState();
+    handleInstructionsButton();
+    handleInstructionsClose();
+    handlePlayAgain();
+    handleViewSolution();
+    handleCongratulationsClose();
 }
 
-function handleKeyDown(e) {
+function handleKeyPress() {
+    document.addEventListener('keydown', handleKeys);
+}
+
+function handleKeys(e) {
 
     if(solved > 0) {return;}
 
@@ -327,291 +537,275 @@ function handleKeyDown(e) {
     display();
 }
 
-function moveLeft() {
-    if(getCol(empty) == 0) {return;}
-
-    userMoves++;
-    let temp = state[empty - 1 - 1].value;
-    state[empty - 1 - 1].value = size*size;
-    state[empty - 1].value = temp;
-    empty -= 1;
+function handleShuffle() {
+    if(shuffle) {
+        shuffle.addEventListener('click', shufflePuzzle);
+    }
 }
 
-function moveRight() {
-    if(getCol(empty) == size - 1) {return;}
-    
-    userMoves++;
-    let temp = state[empty - 1 + 1].value;
-    state[empty - 1 + 1].value = size*size;
-    state[empty - 1].value = temp;
-    empty += 1;
+function handleInitialState() {
+    if(goToInitial) {
+        goToInitial.addEventListener('click', goToInitialState);
+    }
+}
+
+function handleSetInitialState() {
+    if(setInitial) {
+        setInitial.addEventListener('click', setInitialState);
+    }
+}
+
+function handleShowSolution() {
+    if(showSolution) {
+        showSolution.addEventListener('click', solveInitialState);
+    }
+}
+
+function handlePreviousState() {
+    if(previous) {
+        previous.addEventListener('click', previousState);
+    }
+}
+
+function handleNextState() {
+    if(next) {
+        next.addEventListener('click', nextState);
+    }
+}
+
+function handleInstructionsButton() {
+    if(instructionsButton) {
+        instructionsButton.addEventListener('click', instructionsDisplay);
+    }
+}
+
+function handleInstructionsClose() {
+    if(instructionsCloseButton) {
+        instructionsCloseButton.addEventListener('click', instructionsClose);
+    }
+}
+
+function handlePlayAgain() {
+    if(playAgainButton) {
+        playAgainButton.addEventListener('click', playAgain);
+    }
+}
+
+function handleViewSolution() {
+    if(viewSolutionButton) {
+        viewSolutionButton.addEventListener('click', viewSolution);
+    }
+}
+
+function handleCongratulationsClose() {
+    if(congratulationsCloseButton) {
+        congratulationsCloseButton.addEventListener('click', congratulationsClose);
+    }
 }
 
 function moveUp() {
     if(getRow(empty) == 0) {return;}
 
-    userMoves++;
-    let temp = state[empty - 1 - 3].value;
-    state[empty - 1 - 3].value = size*size;
-    state[empty - 1].value = temp;
+    totalUserMoves++;
+    let temp = currentState[empty - 1 - 3].value;
+    currentState[empty - 1 - 3].value = size*size;
+    currentState[empty - 1].value = temp;
     empty -= 3;
+}
+
+function moveRight() {
+    if(getCol(empty) == size - 1) {return;}
+    
+    totalUserMoves++;
+    let temp = currentState[empty - 1 + 1].value;
+    currentState[empty - 1 + 1].value = size*size;
+    currentState[empty - 1].value = temp;
+    empty += 1;
 }
 
 function moveDown() {
     if(getRow(empty) == size - 1) {return;}    
 
-    userMoves++;
-    let temp = state[empty - 1 + 3].value;
-    state[empty - 1 + 3].value = size*size;
-    state[empty - 1].value = temp;
+    totalUserMoves++;
+    let temp = currentState[empty - 1 + 3].value;
+    currentState[empty - 1 + 3].value = size*size;
+    currentState[empty - 1].value = temp;
     empty += 3;
 }
 
-function revertToInitialState() {
-    for(let i = 0; i < size*size; i++) {
-        state[i].value = initialState[i];
+function moveLeft() {
+    if(getCol(empty) == 0) {return;}
 
-        if(state[i].value == size*size) {empty = state[i].position;}
+    totalUserMoves++;
+    let temp = currentState[empty - 1 - 1].value;
+    currentState[empty - 1 - 1].value = size*size;
+    currentState[empty - 1].value = temp;
+    empty -= 1;
+}
+
+function shufflePuzzle() {
+
+    let x;
+
+    do {
+        totalUserMoves = 0;
+
+        while(totalUserMoves < 35) {
+            x = Math.floor((Math.random() * 4));
+
+            switch(x) {
+                case 0: {
+                    moveLeft();
+                    break;
+                }
+
+                case 1: {
+                    moveRight();
+                    break;
+                }
+
+                case 2: {
+                    moveUp();
+                    break;
+                }
+
+                case 3: {
+                    moveDown();
+                    break;
+                }
+            }
+
+            solved = 0;
+            display();
+
+        }
+    } while(isSolved());
+
+    for(let i = 0; i < size*size; i++) {
+        initialState[i] = currentState[i].value;
+
+        if(currentState[i].value == size*size) {
+            empty = currentState[i].position;
+        }
     }
 
-    userMoves = 0;
+    solved = 0;
+    totalUserMoves = 0;
+    solution();
     display();
 }
 
-function handleInitial() {
-    initial.addEventListener('click', revertToInitialState);
-}
-
-function setInitial() {
+function goToInitialState() {
     for(let i = 0; i < size*size; i++) {
-        initialState[i] = state[i].value;
+        currentState[i].value = initialState[i];
+
+        if(currentState[i].value == size*size) {empty = currentState[i].position;}
     }
 
-    userMoves = 0;
+    totalUserMoves = 0;
+    display();
+}
+
+function setInitialState() {
+    for(let i = 0; i < size*size; i++) {
+        initialState[i] = currentState[i].value;
+    }
+
+    totalUserMoves = 0;
     solution();
+    display();
 }
 
-function handleSet() {
-    set.addEventListener('click', setInitial);
-}
-
-function solveInitalState() {
+function solveInitialState() {
     solved = 1;
     index = 0;
     moveNumber = 0;
     for(let i = 0; i < size*size; i++) {
-        state[i].value = initialState[i];
+        currentState[i].value = initialState[i];
 
-        if(state[i].value == size*size) {empty = state[i].position;}
+        if(currentState[i].value == size*size) {empty = currentState[i].position;}
     }
 
     display();
 }
 
-function handleSolve() {
-    solve.addEventListener('click', solveInitalState);
-}
-
-
-function solution() {
-    moves = 0;
-    path = [];
-
-    minHeap = new MinHeap(0);
-    check = true;
-    let current;
-
-    minHeap.insert(new Node(structuredClone(initialState), 0, structuredClone([empty]), empty));
-
-    while(check) {
-        
-        current = minHeap.getMin();
-        minHeap.remove();
-
-        neighbours = [-1, -1, -1, -1];
-
-        if(getCol(current.empty) != 0) {neighbours[0] = current.empty - 1;}
-        if(getCol(current.empty) != size - 1) {neighbours[1] = current.empty + 1;}
-        if(getRow(current.empty) != 0) {neighbours[2] = current.empty - size;}
-        if(getRow(current.empty) != size - 1) {neighbours[3] = current.empty + size;}
-
-        for(let blank of neighbours) {
-            if(blank == -1 || (current.moves > 0 && blank == current.path[current.moves - 1])) {
-                continue;
-            }
-            else {
-                [current.board[blank - 1], current.board[current.empty - 1]] = [current.board[current.empty - 1], current.board[blank - 1]]; 
-
-                current.path.push(blank);
-
-                minHeap.insert(new Node(structuredClone(current.board), current.moves + 1, structuredClone(current.path), blank));
-
-                current.path.pop();
-
-                [current.board[blank - 1], current.board[current.empty - 1]] = [current.board[current.empty - 1], current.board[blank - 1]]; 
-            }
-            
-            if(current.manhattan - current.moves == 0) {check = false;}
-        }
-    }
-    
-    path = current.path;
-    moves = current.moves;
-}
-
-
 function previousState() {
     if(index <= 0) {return;}
     
-    let temp = state[path[index] - 1].value;
-    state[path[index] - 1].value = state[path[index - 1] - 1].value;
-    state[path[index - 1] - 1].value = temp;
+    console.log(index)
+    console.log(path);
 
+    console.log(currentState);
+    
+    let temp = currentState[path[index] - 1].value;
+    currentState[path[index] - 1].value = currentState[path[index - 1] - 1].value;
+    currentState[path[index - 1] - 1].value = temp;
+
+    empty = path[index - 1];
     index -= 1;
     moveNumber -= 1;
 
     display();
 }
 
-function handlePrevious() {
-    previous.addEventListener('click', previousState);
-}
-
 function nextState() {
     if(index >= path.length) {return;}
     
-    let temp = state[path[index] - 1].value;
-    state[path[index] - 1].value = state[path[index + 1] - 1].value;
-    state[path[index + 1] - 1].value = temp;
+    console.log(currentState);
 
+    let temp = currentState[path[index] - 1].value;
+    currentState[path[index] - 1].value = currentState[path[index + 1] - 1].value;
+    currentState[path[index + 1] - 1].value = temp;
+
+    empty = path[index + 1];
     index += 1;
     moveNumber += 1;
 
     display();
 }
 
-function handleNext() {
-    next.addEventListener('click', nextState);
-}
+function solution() {
+    totalSolutionMoves = 0;
+    path = [];
 
-function display() {
-    // console.log(solved);
+    minHeap = new MinHeap(0);
+    check = 1;
+    let minState;
 
-    container.innerHTML = '';
-    for(let tile of state) {
-        
-        if(tile.value == size*size) {continue;}
+    minHeap.insert(new Node(structuredClone(initialState), 0, structuredClone([empty]), empty));
 
-        container.innerHTML += `
-        <div class = 'tile', style = "
-        width: ${600/size}px; 
-        height: ${600/size}px;
-        border: 1px solid;
-        position: absolute;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 2em;
-        background-color: #ddd;
-        opacity: 0.9;
+    while(check === 1) {
         
-        top: ${tile.x*(600/size)}px; left: ${tile.y*(600/size)}px;">
-            ${tile.value}
-        
-        </div>
-        `;
+        minState = minHeap.getMin();
+        minHeap.remove();
+
+        neighbours = [-1, -1, -1, -1];
+
+        if(getCol(minState.empty) != 0) {neighbours[0] = minState.empty - 1;}
+        if(getCol(minState.empty) != size - 1) {neighbours[1] = minState.empty + 1;}
+        if(getRow(minState.empty) != 0) {neighbours[2] = minState.empty - size;}
+        if(getRow(minState.empty) != size - 1) {neighbours[3] = minState.empty + size;}
+
+        for(let blank of neighbours) {
+            if(blank == -1 || (minState.moves > 0 && blank == minState.path[minState.moves - 1])) {
+                continue;
+            }
+            else {
+                [minState.board[blank - 1], minState.board[minState.empty - 1]] = [minState.board[minState.empty - 1], minState.board[blank - 1]]; 
+
+                minState.path.push(blank);
+
+                minHeap.insert(new Node(structuredClone(minState.board), minState.moves + 1, structuredClone(minState.path), blank));
+
+                minState.path.pop();
+
+                [minState.board[blank - 1], minState.board[minState.empty - 1]] = [minState.board[minState.empty - 1], minState.board[blank - 1]]; 
+            }   
+        }
+
+        if(minState.manhattan - minState.moves === 0) {check = 0;}
     }
-
-    if(solved == -1) {
-        initial.innerHTML = '';
-        solve.innerHTML = '';
-        previous.innerHTML = '';
-        next.innerHTML = '';
-
-        set.innerHTML = '';
-        set.innerHTML += `<input type = "button" value = "Set initial state to current state">`;
-        
-        message.innerHTML = '';
-        message.innerHTML += `<p>Click "Shuffle" to shuffle the board or shuffle using arrow keys</p>`;
-        message.innerHTML += `<p>Try solving the puzzle in the least number of moves using arrow keys</p>`;
-        message.innerHTML += `<p>Use arrow keys to move adjacent tiles into the empty space</p>`;
-        message.innerHTML += `<p>Refresh the page to unshuffle the puzzle</p>`;
-
-    }
-
-    if(solved == 0) {
-        previous.innerHTML = '';
-        next.innerHTML = '';
-
-        initial.innerHTML = '';
-        initial.innerHTML += `<input type = "button" value = "Start again from the initial state">`;
-
-        set.innerHTML = '';
-        set.innerHTML += `<input type = "button" value = "Set initial state to current state">`;
-        
-        solve.innerHTML = '';
-        solve.innerHTML += `<input type = "button" value = "View the solution">`;
-
-        message.innerHTML = '';
-        message.innerHTML += `<p>Click "Shuffle" to shuffle the board or shuffle using arrow keys</p>`;
-        message.innerHTML += `<p>Try solving the puzzle in the least number of moves using arrow keys</p>`;
-        message.innerHTML += `<p>Use arrow keys to move adjacent tiles into the empty space</p>`;
-        message.innerHTML += `<p>Refresh the page to unshuffle the puzzle</p>`;
-
-    }
-
-    if(solved == 1) {
-        initial.innerHTML = '';
-        solve.innerHTML = '';
-        set.innerHTML = '';
-
-        numberOfMoves.innerHTML = 'Move number ';
-        numberOfMoves.innerHTML += `${moveNumber}`;
     
-        previous.innerHTML = '';
-        previous.innerHTML += `<input type = "button" value = "Previous">`;
-
-        next.innerHTML = '';
-        next.innerHTML += `<input type = "button" value = "Next">`;
-
-        message.innerHTML = '';
-        message.innerHTML += `<p>Here's the quickest solution.</p>`;
-        message.innerHTML += `<p>It takes ${moves} moves.</p>`;
-        message.innerHTML += `<p>Click "Next" to have a look at the next move.</p>`;
-        message.innerHTML += `<p>Click "Previous" to have a look at the previous move.</p>`;
-    }
-
-    if(solved == 2) {
-
-        initial.innerHTML = '';
-        next.innerHTML = '';
-        previous.innerHTML = '';
-        set.innerHTML = '';
-
-        solve.innerHTML = '';
-        solve.innerHTML += `<input type = "button" value = "View the solution">`;
-
-        message.innerHTML = '';
-        message.innerHTML += `<p>Congratulations! You have solved the puzzle.</p>`;
-        message.innerHTML += `<p>You solved it in ${userMoves} moves.</p>`;
-        message.innerHTML += `<p>The quickest solution takes ${moves} moves.</p>`;
-        message.innerHTML += `<p>Click "View solution" to have a look at the solution.</p>`;
-
-    }
+    path = minState.path;
+    totalSolutionMoves = minState.moves;
 }
-
-/*
-const undo = document.querySelector('#undo');
-const complete = document.querySelector('#complete');
-
-<input type = "button" value = "Undo my move">
-<input type = "button" value = "Return to initial state">
-<input type = "button" value = "Solve from initial state">
-<input type = "button" value = "Show all moves from here">
-<input type = "button" value = "Previous">
-<input type = "button" value = "Next">
-
-function undoMove() {}
-
-function showAllMoves() {}
-*/

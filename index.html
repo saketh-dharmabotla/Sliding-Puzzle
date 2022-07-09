@@ -3,44 +3,90 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slider Puzzle</title>
+    <meta charset = "UTF-8">
+    <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    
+    <title>Slider Puzzle Game</title>
 
-    <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="styles/buttons.css">
+    <link rel="stylesheet" href="styles/pop ups.css">
+    <link rel="stylesheet" href="styles/puzzle.css">
 </head>
 
 <body>
-    <div id = 'message'></div>
-    <div id = 'puzzleContainer'></div>
-    <br><br>
-    <div id = 'numberOfMoves'></div>
-    <br><br>
-    <div id = 'userMoves'></div>
     
-    <div class="createNewCanvas", id="userInputWindow">
-        <form>
-            
-            <div id = "buttons">
-                <div id = "shuffle"> <input type = "button" value = "Shuffle"> </div> 
-                <div id = "initial"></div>
-                <div id = "set"></div>
-                <div id = "solve"></div>
-                <div id = "previous"></div>
-                <div id = "next"></div>
+    <div id = 'instructions-pop-up-window'>
 
-            </div>
-            
-            <!--            
-                <div id = "undo"></div>
-                <div id = "complete"></div>
-            -->
+        <div id = 'instructions-container'>
 
-        </form>
+            <p id = "instructions">
+                Instructions:
+                <br><br>
+                Try to move the tiles around so that you can reach the goal state in the least number of moves.
+                <br><br>
+                In each move you can place a tile, which is adjacent to the empty space, inside the empty space.  
+                <br><br>
+                Use arrow keys to move adjacent tiles into the empty space.
+                <br><br>
+                <ul style="list-style-type:disc; line-height: 200%;">
+                    <li>Up arrow key : the tile below the empty space will move upwards into it</li>
+                    <li>Right arrow key: the tile to the left of the empty space will move rightwards into it</li>
+                    <li>Down arrow key: the tile above the empty space will move downwards into it</li>
+                    <li>Left arrow key: the tile to the right of the empty space will move leftwards into it</li>
+                  </ul>
+                 
+                <br><br>
+                
+                <br><br>
+            
+                <br><br>
+            
+            </p>    
+    
+        </div>
+        
+        <button class = "close-button" id = "instructions-close-button">
+            <img class = "close-icon" src="/images/close-instructions-icon.jpg" alt="close button">
+        </button>
+        
+    </div>
+
+    <div id = 'congratulations-message-pop-up-window'></div>
+
+    <div id = "game-window">
+        
+        <div id = 'puzzle-container'></div>
+    
+        <div id = 'solution-move-number'></div>
+        
+        <div id = 'current-user-moves'></div>
+      
+        <div id = "buttons-container">
+            
+            <div id = "instructions-button-container"> 
+                <button class = "buttons" id = "instructions-button">
+                    Instructions
+                </button>
+            </div> 
+
+            <div id = "shuffle-button-container"> </div> 
+            
+            <div id = "start-from-initial-state-button-container"></div>
+            
+            <div id = "set-initial-state-button-container"></div>
+            
+            <div id = "show-the-solution-button-container"></div>
+
+            <div id = "show-the-previous-state-button-container"></div>
+
+            <div id = "show-the-next-state-button-container"></div>
+
+        </div>
+
     </div>
 
     <script src = "code.js"></script>
+    
 </body>
 </html>

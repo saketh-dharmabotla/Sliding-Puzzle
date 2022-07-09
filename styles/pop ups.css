@@ -1,0 +1,91 @@
+#show-the-solution-button, #view-the-solution-button, #show-the-previous-state-button, #show-the-next-state-button {
+    background-color: rgb(89, 147, 254);
+    font-weight: 700;
+    color: white;
+}
+
+.close-icon {
+    height: 28px;
+    width: 28px;
+    border: 0px;
+    border-radius: 14px;
+}
+
+.close-button {
+    border-radius: 14px;
+    margin-top: 10px;
+    border-width: 0px;
+    height: 28px;
+    width: 28px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    position:absolute;
+    top: -3px;
+    right: 8px;
+}
+
+.close-button:hover {
+    opacity: 0.8;
+}
+
+#instructions-button {
+    background-color: rgb(164, 68, 252);
+    color: white;
+    font-weight: 700;
+}
+
+#instructions, #congratulations-message {
+    font-family: 'Arial';
+    font-size: 16px;
+    font-weight: 500;
+}
+
+#instructions-pop-up-window {
+    box-shadow: 10px 10px 10px rgb(186, 186, 186);
+    background-color:antiquewhite;
+    border-color: black;
+    border-width: 0px;
+    border-style: solid;
+    border-radius: 16px;
+    display: flex;
+    position: fixed;
+    padding: 20px 40px 20px 40px;
+    z-index: 200;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+    opacity: 0;
+}
+
+#congratulations-message-container {
+    position:relative;
+}
+
+#congratulations-buttons-container {
+    display:flex;
+    flex-direction: row;
+    position:absolute;
+    top: 200px;
+    left:-40px;
+    right: -40px;
+    justify-content: space-evenly;
+}
+
+#congratulations-message-pop-up-window {
+    z-index: 300;
+    box-shadow: 10px 10px 10px rgb(186, 186, 186);
+    background-color:antiquewhite;
+    border-color: black;
+    border-width: 0px;
+    border-style: solid;
+    border-radius: 16px;
+    display: flex;
+    position: fixed;
+    padding: 20px 55px 80px 55px;
+    z-index: 200;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -85%);
+    opacity: 0;
+}
