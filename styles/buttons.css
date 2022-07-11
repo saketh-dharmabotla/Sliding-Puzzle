@@ -1,18 +1,5 @@
-#buttons-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    position: fixed;
-    top: 25px;
-    left: 70px;
-    right: 0px;
-
-}
-
 .buttons {
-    background-color:rgb(29, 235, 166);
-    box-shadow: 5px 5px 5px rgb(208, 208, 208);
+    box-shadow: 5px 5px 5px rgb(171, 171, 171);
     border-width: 0px;
     border-radius: 8px;
     padding: 10px 20px 10px 20px;
@@ -21,37 +8,102 @@
     font-size: 16px;
     font-weight: 700;
     transition: 0.1s;
+    cursor: pointer;
 }
 
-.buttons:hover, .close-button:hover {
+.buttons:hover {
     opacity: 0.8;
 }
 
-#current-user-moves {
-    position: fixed;
-    background-color: rgb(255, 100, 80);
-    border: 0px solid black;
-    border-radius: 8px;
-    padding: 10px 20px 10px 20px;
-    top: 300px;
-    left: 100px;
-    font-family: 'Arial';
-    color: white    ;
-    font-size: 16px;
-    font-weight: 700;
+.buttons:active {
+    opacity: 0.3;
 }
 
-#solution-move-number {
-    position: fixed;
+.green-buttons {
+    background-color:rgb(29, 235, 166);
+}
+
+.purple-buttons {
+    background-color: rgb(164, 68, 252);
+}
+
+.blue-buttons {
     background-color: rgb(89, 147, 254);
-    border: 0px solid black;
-    border-radius: 8px;
-    padding: 10px 20px 10px 20px;
-    top: 300px;
+}
+
+#instructions-button-container {
+    position: fixed;
+    top: 30px;
     left: 150px;
-    z-index: 30;
-    font-family: 'Arial';
-    color: aliceblue;
-    font-size: 16px;
-    font-weight: 700;
+}
+
+#shuffle-button-container {
+    position: fixed;
+    top: 30px;
+    left: 430px;
+}
+
+#start-here-button-container {
+    position: fixed;
+    top: 30px;
+    left: 680px; 
+}
+
+#solution-button-container {
+    position: fixed;
+    top: 30px;
+    left: 1180px;
+}
+
+#reset-button-container {
+    position: fixed;
+    top: 30px;
+    left: 950px;
+}
+
+#previous-button-container {
+    position: absolute;
+    top: 2000px;
+    right: 290px;
+}
+
+#next-button-container {
+    position: absolute;
+    top: 2000px;
+    right: 120px; 
+}
+
+#start-again-button-container {
+    position: absolute;
+    top: 415px;
+    left: 155px;
+}
+
+.close-icons {
+    height: 28px;
+    width: 28px;
+    border: 0px;
+    border-radius: 14px;
+}
+
+.close-buttons {
+    border-radius: 14px;
+    margin-top: 10px;
+    border-width: 0px;
+    height: 28px;
+    width: 28px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    position:absolute;
+    top: -3px;
+    right: 8px;
+}
+
+.close-buttons:hover {
+    opacity: 0.8;
+}
+
+.close-buttons:active {
+    opacity: 0.3;
 }
